@@ -94,3 +94,29 @@ Step 9: Create another comp for chat message form in chat-view/ and use it in ch
 Step 10: Create a chat/hook folder and inside that create use-ai-model.ts hook to use ai models
 
 Step 11: Create a model selector comp in chat-view/comp
+
+# Chapter 6: End-to-End Chat setup
+Backend Schema, API and UI hooks
+
+> FLow: User init chat --> useCreateChat hook trigger --> a server action -> to create msg into db --> we redirect to that specific chat id page --> then that msg trigger --> ai agent --> which will generate response
+
+> Relationship table 
+
+| Relationship | From | To | Type |
+| :---: | :---: | :---: | :---: |
+| User own Chats | User | Chat | 1:N(1 to many) |
+| Chats contains Messages | Chat | Messages | 1:N(1 to many) |
+| Message has Attachements | Message | Attachement | 1:N(1 to many) |
+| User has Sessions | User | Session | 1:N(1 to many) |
+| User has Accounts | User | Account | 1:N(1 to many) |
+
+
+Step 1: Create chat model and message model in schema file
+And a chat can have multiple msgs and a chat is owned by a user
+And to identify which msg is of user and which is of ai, we use msg role
+
+Step 2: run migrate and generate cmd
+
+Step 3: Now create server action as whenevr user first init chat -> we want to do 2 things: create a chat with msgs and another is or initialising it inside chat/actn/index.ts
+
+Step 4: Create hooks related to chat in chat/hooks/use-chats.ts
