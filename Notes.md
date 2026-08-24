@@ -69,3 +69,28 @@ Step: Create theme-provider inside comp/providers/ and then wrap Root layout fil
 Step : Create heading compo which contain mode-toogler in root comp and use it inside (root)/layout
 
 Step: Also create a mode-toggle comp isnide root comp
+
+# Chapter 5:
+Implementing Model Selectn: Openrouter(unified interface for LLM's), Fetching models and ui setup
+
+Step 1: Create openrouter account and get api and paste into env file
+
+Step 2: Implement backend route to fetch all free ai models inside api/ai/get-models/route.ts 
+
+Step 3: Setup tanstack query -> npm i @tanstack/react-query
+
+Step 4: Create query provider inside comp/providers -> wrap layout file inside it
+
+Step 5: Create home page view by importing Chat msg view comp in home page
+
+Step 6: Create ChatMessageView comp inside chat/comp/chat-view/chat-message-view.tsx
+
+Step 7: Create another chat welcome tab comp there
+
+Step 8: Create a comp of constants inside chat welcome tab comp
+
+Step 9: Create another comp for chat message form in chat-view/ and use it in chat msg view comp
+
+Step 10: Create a chat/hook folder and inside that create use-ai-model.ts hook to use ai models
+
+Step 11: Create a model selector comp in chat-view/comp
