@@ -10,16 +10,138 @@ import {
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusIcon, SearchIcon, EllipseIcon, Trash } from 'lucide-react';
+import { PlusIcon, SearchIcon, EllipseIcon, Trash, EllipsisIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import UserButton from '@/modules/auth/components/user-button';
 import { isToday, isYesterday, isWithinInterval, subDays } from 'date-fns';
+import { usePathname } from 'next/navigation';
 
 
-const ChatSidebar = ({user}) => {
+function groupChatsByDate(chats: any) {
+  const groups = { today: [], yesterday: [], lastWeek: [], older: [] };
+  const now = new Date();
 
-    const [searchQuery, setSearchQuery] = useState("")
+  if (!chats || !Array.isArray(chats)) return groups;
+
+  chats.forEach((chat) => {
+    try {
+      const chatDate = chat.createdAt;
+      const date = typeof chatDate === "string" ? new Date(chatDate) : chatDate;
+      
+      console.log("Processing chat:", chat.id, "Date:", date, "createdAt:", chatDate);
+
+      if (isToday(date)) {
+        groups.today.push(chat);
+      } else if (isYesterday(date)) {
+        groups.yesterday.push(chat);
+      } else if (isWithinInterval(date, { start: subDays(now, 7), end: now })) {
+        groups.lastWeek.push(chat);
+      } else {
+        groups.older.push(chat);
+      }
+    } catch (error) {
+      console.error("Error processing chat date:", error, chat);
+      groups.older.push(chat);
+    }
+  });
+
+  return groups;
+}
+
+const DATE_GROUPS = [
+  { key: "today", label: "Today" },
+  { key: "yesterday", label: "Yesterday" },
+  { key: "lastWeek", label: "Last 7 Days" },
+  { key: "older", label: "Older" },
+];
+
+function ChatItem({ chat, isActive, onDelete }) {
+  return (
+    <Link
+      href={`/chat/${chat.id}`}
+      className={cn(
+        "flex items-center justify-between rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors",
+        isActive && "bg-sidebar-accent",
+      )}
+    >
+      <span className="truncate flex-1">{chat.title}</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 shrink-0 hover:bg-sidebar-accent-foreground/10"
+            onClick={(e) => e.preventDefault()}
+          >
+            <EllipsisIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            className="text-red-500 cursor-pointer"
+            onClick={(e) => onDelete(e, chat.id)}
+          >
+            <Trash className="h-4 w-4 mr-2" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </Link>
+  );
+}
+
+function ChatGroup({ label, chats, activeChatId, onDelete }) {
+  if (chats.length === 0) return null;
+
+  return (
+    <div className="mb-4">
+      <div className="mb-2 px-2 text-xs font-semibold text-muted-foreground">
+        {label}
+      </div>
+      {chats.map((chat) => (
+        <ChatItem
+          key={chat.id}
+          chat={chat}
+          isActive={chat.id === activeChatId}
+          onDelete={onDelete}
+        />
+      ))}
+    </div>
+  );
+}
+
+
+const ChatSidebar = ({user, chats}) => {
+
+  const pathname = usePathname();
+  const activeChatId = pathname?.startsWith('/chat/') ? pathname.split("/")[2] : null;
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
+
+  const filteredChats = useMemo(() => {
+    if(!searchQuery) return chats;
+    const query = searchQuery.toLowerCase();
+
+    return chats.filter(
+      (chat:any) => chat.title?.toLowerCase().includes(query) ||
+      chat.messages?.some((msg:any) => msg.content?.toLowerCase().includes(query))
+    )
+  }, [searchQuery, chats]);
+
+  // grouping chats based on days as chats done in one day is separated by grp chats
+  const groupedChats = useMemo(
+    () => groupChatsByDate(filteredChats),
+    [filteredChats]
+  )
+
+  const handleDelete = (e: React.MouseEvent, chatId:string) => {
+    e.preventDefault();
+    e.stopPropagation()
+    setSelectedChatId(chatId);
+    setIsModalOpen(true)
+  }
 
   return (
     <div className="flex h-full w-64 flex-col border-r border-border bg-sidebar">
@@ -58,7 +180,23 @@ const ChatSidebar = ({user}) => {
       </div>
 
       <div className='flex-1 overflow-y-auto px-2'>
-        {/* Todo */}
+        {
+          filteredChats.length === 0 ? (
+            <div className='text-center text-sm text-muted-foreground py-8'>
+              {searchQuery ? "No chats found" : "No chats yet"}
+            </div>
+          ) : (
+            DATE_GROUPS.map((group) => (
+              <ChatGroup
+                key={group.key}
+                label={group.label}
+                chats={groupedChats[group.key]}
+                activeChatId={activeChatId}
+                onDelete={handleDelete}
+              />
+            ))
+          )
+        }
       </div>
 
       {/* footer */}

@@ -120,3 +120,10 @@ Step 2: run migrate and generate cmd
 Step 3: Now create server action as whenevr user first init chat -> we want to do 2 things: create a chat with msgs and another is or initialising it inside chat/actn/index.ts
 
 Step 4: Create hooks related to chat in chat/hooks/use-chats.ts
+
+# Chapter 7: Building chat sidebar
+Data fetch and component design
+
+Step 1: Go to chat sidebar comp and start upgrading the code for better ui and functionality
+
+Step 2: Create chat id page as (root)/chat/chatID
