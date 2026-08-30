@@ -7,6 +7,8 @@ import { Send } from 'lucide-react';
 import React, { useState } from 'react'
 import { useAiModels } from '../../hooks/use-ai-models';
 import { ModelSelector } from './model-selector';
+import { useCreateChat } from '../../hooks/use-chats';
+import { toast } from 'sonner';
 
 export default function ChatMessageForm({initialMessage, onMessageChange}){
 
@@ -14,7 +16,21 @@ export default function ChatMessageForm({initialMessage, onMessageChange}){
     const [selectedModel, setSelectedModel] = useState(models?.models[0].id);
     const [message, setMessage] = useState("")
 
-    const handleSubmit = async() => {}
+    const {mutateAsync, isPending: isChatPending} = useCreateChat()
+
+    const handleSubmit = async(e) => {
+      try {
+        e.preventDefault();
+        await mutateAsync({content:message, model:selectedModel})
+        toast.success('Message sent successfully')
+      } catch (error) {
+        console.error("Error sending message:", error);
+        toast.error('Failed to send message')
+      }
+      finally {
+        setMessage("")
+      }
+    }
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pb-6">
