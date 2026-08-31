@@ -136,3 +136,18 @@ Step 1: Start creating chatId page
 Step 2: Create a message-view-form comp inside chat/comp to show msg form or chat form
 
 Step 3: install ai sd elements as : npx shadcn@latest add @ai-elements/all or from docs
+
+
+# Chapter 9: Advanced Chat Api Development
+Streaming, Message Conversion and Persistence
+
+Flow : Frontend -> when hit send msg -> create POST req and hit an endpt /api/chat contains(chatId, msgs, model, skipUser)  -> Then we go to Route handler -> and perform these actns  ->  1. where we load old msg -> 2. then merge old + new(UI format)  ->  3. Convert to model format(in which format ai accept msgs)  ->  4. then streamText() means send data chunk by chunk   ->  these stram msg sent to frontend in form of streaming Token  -> And when entire Stream or msg is finished  ->  5. Save it(user & assistant msg) to db  ->  so when next time user comes, it sees all msgs
+
+
+Step 1: Install ai sdk and open router inside your project as :
+npm install ai
+npm install @openrouter/ai-sdk-provider
+
+Step 2: Create chat route inside api/chat
+
+Step 3: Create prompt.ts file inside lib which contains prompts in structured way which will attch with user msgs providing better context and understanding to AI
