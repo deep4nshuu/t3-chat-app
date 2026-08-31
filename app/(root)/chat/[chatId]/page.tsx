@@ -1,10 +1,14 @@
+import MessageViewWithForm from '@/modules/chat/components/messages/message-view-form';
 import React from 'react'
 
-const ChatPage = () => {
+const ChatPage = async({params}: {
+  params: Promise<{chatId: string}>
+}) => {
+
+  const {chatId} = await params;
+
   return (
-    <div>
-      
-    </div>
+    <MessageViewWithForm chatId={chatId} />
   )
 }
 

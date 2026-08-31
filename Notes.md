@@ -127,3 +127,12 @@ Data fetch and component design
 Step 1: Go to chat sidebar comp and start upgrading the code for better ui and functionality
 
 Step 2: Create chat id page as (root)/chat/chatID
+
+# Chapter 8 : Active Chat Sidebar Items
+Dynamic Page & Messaging Components
+
+Step 1: Start creating chatId page
+
+Step 2: Create a message-view-form comp inside chat/comp to show msg form or chat form
+
+Step 3: install ai sd elements as : npx shadcn@latest add @ai-elements/all or from docs
